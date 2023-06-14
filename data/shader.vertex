@@ -1,0 +1,21 @@
+#version 330
+
+uniform mat4 MVP;
+uniform mat4 M;
+attribute vec4 pos;
+attribute vec4 color;
+attribute vec4 normal;
+attribute vec4 uv;
+out vec4 fcolor;
+out vec4 fnormal;
+out vec4 fpos;
+out vec4 fuv;
+
+void main(){
+    gl_Position=MVP*pos;
+	fcolor=color;
+	fpos=M*pos;
+	fnormal=inverse(transpose(M))*normal;
+	fnormal=vec4(normalize(fnormal.xyz),0.0f);
+	fuv = uv;
+}

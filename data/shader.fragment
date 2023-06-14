@@ -1,0 +1,55 @@
+#version 330
+
+struct light_t{
+	vec4 position;
+	vec4 color;
+	int  type;
+	vec4 direction;
+	float ka;
+	float kd;
+	float ks;
+};
+
+struct material_t{
+	sampler2D textureUnitID;
+};
+
+
+uniform light_t light;
+uniform material_t materials;
+
+in vec4 fcolor;
+in vec4 fnormal;
+in vec4 fpos;
+in vec4 fuv;
+
+void main(){
+    vec4 finalColor=fcolor;
+	finalColor=texture2D(materials.textureUnitID, fuv.xy);
+
+	vec4 finalLight=vec4(1.0f,1.0f,1.0f,1.0f);
+
+	float ambient=1.0f;
+	float diffuse=0.0f;
+	float specular=0.0f;
+
+	vec3 lightPos=vec3(0.0f,0.0f,0.0f);
+	vec3 N=normalize(fnormal.xyz);
+
+	if(light.type==0)
+	{
+		lightPos=normalize(light.direction.xyz);
+	}
+	if(light.type==1)
+	{
+		lightPos=normalize(light.position.xyz-fpos.xyz);
+	}
+
+	ambient=light.ka;
+	diffuse=light.kd*max(dot(lightPos,N),0.0f);
+    specular=light.ks;
+
+	finalLight=(ambient+diffuse+specular)*(light.color);
+
+	gl_FragColor=finalColor*finalLight;
+}
